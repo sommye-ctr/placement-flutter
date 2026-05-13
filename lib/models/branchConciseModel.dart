@@ -6,11 +6,11 @@ class BranchConciseModel {
   final String companyDetails;
 
   BranchConciseModel({
-    this.studentDegree,
-    this.studentBranchName,
-    this.selected,
-    this.studentDetails,
-    this.companyDetails
+    required this.studentDegree,
+    required this.studentBranchName,
+    required this.selected,
+    required this.studentDetails,
+    required this.companyDetails
   });
 
   factory BranchConciseModel.fromJson(Map<String, dynamic> _json) {

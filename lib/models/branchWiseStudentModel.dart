@@ -1,12 +1,12 @@
 class BranchWiseStudentModel {
-  final int studentEnrolmentNumber;
+  final int? studentEnrolmentNumber;
   final String studentName;
   final String companyName;
 
   BranchWiseStudentModel({
     this.studentEnrolmentNumber,
-    this.studentName,
-    this.companyName
+    required this.studentName,
+    required this.companyName
   });
 
   factory BranchWiseStudentModel.fromJson(Map<String, dynamic> _json) {

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:placement/shared/ProfileStatusIcon.dart';
-import 'package:placement/shared/loadingPage.dart';
-import 'package:placement/viewmodels/CandidateDetailsViewModel.dart';
-import 'package:placement/viewmodels/ProfilesForMeViewModel.dart';
-import 'package:placement/views/baseView.dart';
+
+import '../shared/ErrorWidget.dart';
+import '../shared/ProfileStatusIcon.dart';
+import '../shared/loadingPage.dart';
+import '../viewmodels/ProfilesForMeViewModel.dart';
+import 'baseView.dart';
 
 class ProfilesForMeView extends StatelessWidget {
-  const ProfilesForMeView({Key key}) : super(key: key);
+  const ProfilesForMeView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,47 +20,28 @@ class ProfilesForMeView extends StatelessWidget {
   }
 
   Widget _applyWidget(BuildContext context, ProfilesForMeViewModel model) {
-    if (model.isLoading)
+    if (model.isBusy)
       return Center(
         child: LoadingPage(),
       );
-    return Container(
+    return ConstrainedBox(
       constraints: BoxConstraints.expand(),
       child: _applyList(context, model),
     );
   }
 
   Widget _applyList(BuildContext context, ProfilesForMeViewModel model) {
-    if (model.isNull) {
-      return Center(
-        child: Text("Not Eligible for any active season"),
-      );
-      // return BaseView<CandidateDetailsViewModel>(
-      //   onModelReady: (model) {
-      //     model.fetchCandidate();
-      //   },
-      //   builder: (context, model, child) {
-      //     if (model.candidate.internshipStatus == "Closed" ||
-      //         model.candidate.season == "Not Eligible") {
-      //       return Center(
-      //         child: Text("Not Eligible for any active season"),
-      //       );
-      //     }
-
-      //     return Center(
-      //       child: Text("Not Eligible for any open profiles"),
-      //     );
-      //   },
-      // );
-      // return Center(
-      //   child: Text("Not Eligible for any open profiles"),
-      // );
+    final profiles = model.profiles;
+    if (profiles == null) {
+      return ErrorWidgetWithRefreshCallback(onRefresh: model.refreshAndWait);
+    }
+    if (profiles.isEmpty){
+      return Center(child: Text("No Active Profiles"),);
     }
     return RefreshIndicator(
       onRefresh: model.refreshAndWait,
       child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: model.profiles.length,
+        itemCount: profiles.length,
         padding: EdgeInsets.all(5),
         itemBuilder: (BuildContext context, int index) {
           return Card(
@@ -67,9 +49,9 @@ class ProfilesForMeView extends StatelessWidget {
             elevation: 0.3,
             child: ListTile(
               title: Text(
-                model.profiles[index].companyName +
+                profiles[index].companyName +
                     " (" +
-                    model.profiles[index].name +
+                    profiles[index].name +
                     ")",
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -83,16 +65,15 @@ class ProfilesForMeView extends StatelessWidget {
               ),
               onTap: () {
                 Navigator.of(context).pushNamed("/profileDetail", arguments: {
-                  "profileId": model.profiles[index].profileId,
+                  "profileId": profiles[index].profileId,
                   "parentViewModel": model,
-                  "profileModel": model.profiles[index]
+                  "profileModel": profiles[index]
                 });
               },
-              //trailing: _profileStatusIcon(context,model.profiles[index].status,model.profiles[index])
               trailing: ProfileStatusIcon(
                 model: model,
-                profile: model.profiles[index],
-                status: model.profiles[index].status,
+                profile: profiles[index],
+                status: profiles[index].status,
               ),
             ),
           );

@@ -4,8 +4,8 @@ class ResultModel {
 
   ResultModel(
     {
-      this.key,
-      this.value
+      required this.key,
+      required this.value
     }
   );
 }

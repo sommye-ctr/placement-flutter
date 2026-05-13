@@ -2,28 +2,25 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:placement/locator.dart';
-
-import 'package:placement/resources/endpoints.dart';
-
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:placement/resources/strings.dart';
-import 'package:placement/services/api_models/fetchService.dart';
-import 'package:placement/shared/GlobalCache.dart';
+
+import '../../locator.dart';
+import '../../resources/endpoints.dart';
+import '../../resources/strings.dart';
+import '../../shared/GlobalCache.dart';
 
 class AuthService {
-  FetchService _fetchService;
-  static final AuthService _auth = AuthService.internal();
+  // FetchService _fetchService;
+  static final AuthService _auth = AuthService._internal();
 
   factory AuthService() => _auth;
 
-  AuthService.internal() {
+  AuthService._internal() {
     initState();
   }
 
-  void initState() {
-    _openEncryptedBox();
+  Future<void> initState() async {
+    await _openEncryptedBox();
   }
 
   var _box;
@@ -47,7 +44,7 @@ class AuthService {
 
   Future<void> refreshToken() async {
     var _jsonData;
-    String _refresh = _box.get('refresh');
+    String? _refresh = _box.get('refresh');
     try {
       var _res = await http.post(
         Uri.parse(EndPoints.HOST + EndPoints.REFRESH),
@@ -91,11 +88,11 @@ class AuthService {
     _box.put('access', access);
   }
 
-  _openEncryptedBox() async {
+  Future<void> _openEncryptedBox() async {
     print("initialising box");
     await Hive.initFlutter();
     await Hive.openBox(Strings.AUTH_BOX);
     _box = Hive.box(Strings.AUTH_BOX);
-    refreshToken();
+    await refreshToken();
   }
 }

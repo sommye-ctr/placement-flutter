@@ -4,7 +4,7 @@ import 'package:placement/models/RoundSetModel.dart';
 import 'package:placement/models/applicationModel.dart';
 
 class DetailCompanyProfileModel {
-  int id,
+  int? id,
     applicationCost,
     packageCtcUg,
     packageCtcPg,
@@ -13,9 +13,9 @@ class DetailCompanyProfileModel {
     packageBasePg,
     packageBasePhd,
     talkAbsenceCost;
-  CompanyDetailModel company;
+  CompanyDetailModel? company;
   dynamic application;
-  String name,
+  String? name,
     profileStatus,
     category,
     cgpaRequirement,
@@ -27,10 +27,10 @@ class DetailCompanyProfileModel {
     applicationDeadline,
     talkDate,
     talkStatus;
-  bool requiresCoverLetter,
+  bool? requiresCoverLetter,
     talkPresenceRequired;
-  List<BranchRequirementModel> branchRequirement;
-  final List<RoundSetModel> roundSet;
+  List<BranchRequirementModel>? branchRequirement;
+  final List<RoundSetModel>? roundSet;
 
   DetailCompanyProfileModel({
     this.application, this.applicationDeadline, this.category,
@@ -63,7 +63,7 @@ class DetailCompanyProfileModel {
     }
     return DetailCompanyProfileModel(
       application: _application,
-      applicationCost : json['applicationCost'],
+      applicationCost : json['applicationCost'] ?? 0,
       applicationDeadline: json['applicationDeadline'] ?? "",
       category: json['category'] ?? "",
       cgpaRequirement: json['cgpaRequirement'],
@@ -74,14 +74,14 @@ class DetailCompanyProfileModel {
       name: json['name'] ?? "",
       post: json['post'] ?? "",
       profileStatus: json['profileStatus'] ?? "",
-      requiresCoverLetter: json['requiresCoverLetter'],
+      requiresCoverLetter: json['requiresCoverLetter'] ?? false,
       targetCreditPool: json['targetCreditPool'] ?? "",
       packageCtcPg: json['packageCtcPg'],
       packageCtcPhd: json['packageCtcPhd'],
       packageCtcUg: json['packageCtcUg'],
-      talkAbsenceCost: json['talkAbsenceCost'],
+      talkAbsenceCost: json['talkAbsenceCost'] ?? 0,
       talkDate: json['talkDate'] ?? "",
-      talkPresenceRequired: json['talkPresenceRequired'] ?? "",
+      talkPresenceRequired: json['talkPresenceRequired'] ?? false,
       branchRequirement: branchList,
       packageDescription: json['packageDescription'] ?? "",
       talkStatus: json['talkStatus'] ?? "",

@@ -1,33 +1,18 @@
-
 import 'package:jiffy/jiffy.dart';
-import 'package:placement/locator.dart';
-import 'package:placement/models/DetailCompanyProfileModel.dart';
-import 'package:placement/services/generic/applyService.dart';
-import 'package:placement/viewmodels/BaseViewModel.dart';
+
+import '../locator.dart';
+import '../models/DetailCompanyProfileModel.dart';
+import '../services/generic/applyService.dart';
+import 'BaseViewModel.dart';
 
 class CompanyDetailViewModel extends BaseViewModel {
+  DetailCompanyProfileModel? _companyProfile;
+  final ApplyService _applyService = locator<ApplyService>();
+  late int _profileId;
+  DetailCompanyProfileModel? get companyProfile => _companyProfile;
 
-  DetailCompanyProfileModel _companyProfile;
-  ApplyService _applyService = locator<ApplyService>();
-  bool _isDisposed = false;
-  bool _isLoading = false;
-  int _profileId;
-
-  bool get isLoading => _isLoading;
-  DetailCompanyProfileModel get companyProfile => _companyProfile;
-
-  @override
-  void dispose() { 
-    _isDisposed = true;
-    super.dispose();
-  }
-
-  void notif() {
-    if(!_isDisposed) notifyListeners(); 
-  }
-
-  String formatIt(String it) {
-    if(it == null || it == "") return "-";
+  String formatIt(String? it) {
+    if (it == null || it == "") return "-";
     return it;
   }
 
@@ -36,20 +21,29 @@ class CompanyDetailViewModel extends BaseViewModel {
   }
 
   bool checkPackage(String st) {
-    if(st == "ug") return (_companyProfile.packageBaseUg != null) || (_companyProfile.packageCtcUg != null);
-    else if(st == "pg") return (_companyProfile.packageBasePg != null) || (_companyProfile.packageCtcPg != null);
-    else if(st == "phd") return (_companyProfile.packageBasePhd != null) || (_companyProfile.packageCtcPhd != null);
-    else return true;
+    if (st == "ug") {
+      return (_companyProfile?.packageBaseUg != null) ||
+          (_companyProfile?.packageCtcUg != null);
+    } else if (st == "pg") {
+      return (_companyProfile?.packageBasePg != null) ||
+          (_companyProfile?.packageCtcPg != null);
+    } else if (st == "phd") {
+      return (_companyProfile?.packageBasePhd != null) ||
+          (_companyProfile?.packageCtcPhd != null);
+    } else {
+      return true;
+    }
   }
 
-  String formatInt(int it) {
-    if(it == null) return "-";
+  String formatInt(int? it) {
+    if (it == null) return "-";
     return it.toString();
   }
 
-  String formatDate(String it) {
-    if(it == "") return "-";
-    return Jiffy(it).yMMMd + ", " + Jiffy(it).Hm;
+  String formatDate(String? it) {
+    if (it == null || it == "") return "-";
+    final jiffy = Jiffy.parse(it).toLocal();
+    return "${jiffy.yMMMd}, ${jiffy.Hm}";
   }
 
   Future<void> refreshDetails() async {
@@ -58,16 +52,14 @@ class CompanyDetailViewModel extends BaseViewModel {
 
   String getTime(String time) {
     List<String> _list = time.split(":");
-    return _list[0] + ":" + _list[1];
+    return "${_list[0]}:${_list[1]}";
   }
 
   Future<void> fetchCompanyDetails(int profileId) async {
     print("DETAIL FOR PID $profileId");
     _profileId = profileId;
-    _isLoading = true;
-    notif();
+    setLoading();
     _companyProfile = await _applyService.fetchCompanyDetails(profileId);
-    _isLoading = false;
-    notif();
+    setIdle();
   }
 }

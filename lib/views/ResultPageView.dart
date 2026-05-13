@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:placement/resources/R.dart';
-import 'package:placement/resources/strings.dart';
-import 'package:placement/screens/home/screen_for_results/bottomSheetForm.dart';
-import 'package:placement/viewmodels/ResultPageViewModel.dart';
-import 'package:placement/views/ResultsBranchWiseView.dart';
-import 'package:placement/views/ResultsCompanyWiseView.dart';
-import 'package:placement/views/baseView.dart';
+
+import '../resources/R.dart';
+import '../resources/strings.dart';
+import '../screens/home/screen_for_results/bottomSheetForm.dart';
+import '../viewmodels/ResultPageViewModel.dart';
+import 'ResultsBranchWiseView.dart';
+import 'ResultsCompanyWiseView.dart';
+import 'baseView.dart';
 
 class ResultPageView extends StatefulWidget {
-  ResultPageView({Key key}) : super(key: key);
+  ResultPageView({super.key});
 
   @override
   _ResultPageViewState createState() => _ResultPageViewState();
@@ -16,7 +17,7 @@ class ResultPageView extends StatefulWidget {
 
 class _ResultPageViewState extends State<ResultPageView>
     with SingleTickerProviderStateMixin {
-  TabController _tabController;
+  late TabController _tabController;
 
   @override
   void initState() {
@@ -63,7 +64,7 @@ class _ResultPageViewState extends State<ResultPageView>
             child: FloatingActionButton(
               backgroundColor: R.primaryCol,
               onPressed: () {
-                showModalBottomSheet(
+                showModalBottomSheet<Map<String,int>>(
                     context: context,
                     isScrollControlled: true,
                     builder: (context) {
@@ -72,19 +73,15 @@ class _ResultPageViewState extends State<ResultPageView>
                           yearSelectionVariable: model.yearSelectionVariable,
                           resultTypeVariable: model.resultTypeVariable,
                           sortVariable: model.sortVariable,
-                          valueChangedForYear: model.selectYear,
-                          valueChangedForResult: model.selectResultType,
-                          valueChangedForSort: model.selectSort,
                         ),
                       );
                     }).then((value) {
                   if (value != null) {
-                    model.setFields(
-                        value['year'], value['type'], value['sort']);
+                    model.setFields(value['year'], value['type'], value['sort']);
                   }
                 });
               },
-              child: Icon(
+              child: const Icon(
                 Icons.filter_list,
               ),
             ),
@@ -128,11 +125,12 @@ class _ResultPageViewState extends State<ResultPageView>
     );
   }
 
-  Widget _resultsListPage(BuildContext context, ResultPageViewModel model) {
+  PreferredSizeWidget _resultsListPage(BuildContext context, ResultPageViewModel model) {
     return TabBar(
       controller: _tabController,
       tabs: _profileTabs,
       unselectedLabelColor: Colors.white70,
+      labelColor: Colors.white,
       indicatorPadding: EdgeInsets.only(top: 10),
       indicatorColor: Colors.white,
       indicatorWeight: 6.0,

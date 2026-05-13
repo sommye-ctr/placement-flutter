@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
-import 'package:placement/screens/home/screens_for_apply/bottomModalApplySheet.dart';
-import 'package:placement/shared/loadingPage.dart';
-import 'package:placement/viewmodels/CompanyDetailViewModel.dart';
-import 'package:placement/views/baseView.dart';
+
+import '../models/DetailCompanyProfileModel.dart';
+import '../resources/R.dart';
+import '../screens/home/screens_for_apply/bottomModalApplySheet.dart';
+import '../shared/loadingPage.dart';
+import '../viewmodels/CompanyDetailViewModel.dart';
+import 'baseView.dart';
 
 class CompanyDetailView extends StatelessWidget {
-  final Map<String, dynamic> args;
-  const CompanyDetailView({Key key, this.args}) : super(key: key);
+  final dynamic args;
+  const CompanyDetailView({super.key, required this.args});
 
   @override
   Widget build(BuildContext context) {
@@ -24,80 +27,88 @@ class CompanyDetailView extends StatelessWidget {
 
   Widget _companyDetailScaffold(
       BuildContext context, CompanyDetailViewModel model, double _width) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Profile Details"),
-      ),
-      body: (model.isLoading)
-          ? Center(
-              child: LoadingPage(),
-            )
-          : Container(
-              constraints: BoxConstraints.expand(),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    SizedBox(
-                      height: 30,
+    final companyProfile = model.companyProfile;
+    return ColoredBox(
+      color: R.primaryCol,
+      child: SafeArea(
+        left: false,
+        right: false,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text("Profile Details"),
+          ),
+          body: (model.isBusy || companyProfile == null)
+              ? Center(
+                  child: LoadingPage(),
+                )
+              : ConstrainedBox(
+                  constraints: BoxConstraints.expand(),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        const SizedBox(
+                          height: 30,
+                        ),
+                        _header(context, model, companyProfile, _width),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        _applyButton(context, model, companyProfile, _width),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        _description(context, companyProfile, _width),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        _eligibleBranches(context, companyProfile, _width),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        _profileDetail(context, model, companyProfile, _width),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        _packageDetail(context, model, companyProfile, _width),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        _roundSet(context, model, companyProfile, _width),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                      ],
                     ),
-                    _header(context, model, _width),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    _applyButton(context, model, _width),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    _description(context, model, _width),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    _eligibleBranches(context, model, _width),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    _profileDetail(context, model, _width),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    _packageDetail(context, model, _width),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    _roundSet(context, model, _width),
-                    SizedBox(
-                      height: 20,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+        ),
+      ),
     );
   }
 
   Widget _roundSet(
-      BuildContext context, CompanyDetailViewModel model, double _width) {
+      BuildContext context, CompanyDetailViewModel model, DetailCompanyProfileModel companyProfile, double _width) {
     int inx = 0;
-    return (model.companyProfile.roundSet.length == 0)
-        ? Container()
-        : Container(
+    return (companyProfile.roundSet!.length == 0)
+        ? const SizedBox.shrink()
+        : SizedBox(
             width: _width * 0.9,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 _sectionHeading("Process Details"),
-                SizedBox(
+                const SizedBox(
                   height: 5,
                 ),
                 Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: model.companyProfile.roundSet.map((val) {
+                  children: companyProfile.roundSet!.map((val) {
                     return _rowItem(
                         context,
-                        val.name,
-                        Jiffy(val.date).yMMMd + ", " + model.getTime(val.time),
+                        val.name!,
+                        Jiffy.parse(val.date!).toLocal().yMMMd + ", " + model.getTime(val.time!),
                         (inx++) % 2 == 0);
                   }).toList(),
                 ),
@@ -107,9 +118,9 @@ class CompanyDetailView extends StatelessWidget {
   }
 
   Widget _packageDetail(
-      BuildContext context, CompanyDetailViewModel model, double _width) {
+      BuildContext context, CompanyDetailViewModel model,DetailCompanyProfileModel companyProfile, double _width) {
     return (model.checkOverallPackage())
-        ? Container(
+        ? SizedBox(
             width: _width * 0.9,
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -119,79 +130,79 @@ class CompanyDetailView extends StatelessWidget {
                 _rowItemDual(
                     context,
                     "Under Graduate",
-                    model.formatInt(model.companyProfile.packageCtcUg),
-                    model.formatInt(model.companyProfile.packageBaseUg),
+                    model.formatInt(companyProfile.packageCtcUg),
+                    model.formatInt(companyProfile.packageBaseUg),
                     true,
                     visible: model.checkPackage("ug")),
                 _rowItemDual(
                     context,
                     "Post Graduate",
-                    model.formatInt(model.companyProfile.packageCtcPg),
-                    model.formatInt(model.companyProfile.packageBasePg),
+                    model.formatInt(companyProfile.packageCtcPg),
+                    model.formatInt(companyProfile.packageBasePg),
                     false,
                     visible: model.checkPackage("pg")),
                 _rowItemDual(
                     context,
                     "PHd",
-                    model.formatInt(model.companyProfile.packageCtcPhd),
-                    model.formatInt(model.companyProfile.packageBasePhd),
+                    model.formatInt(companyProfile.packageCtcPhd),
+                    model.formatInt(companyProfile.packageBasePhd),
                     true,
                     visible: model.checkPackage("phd")),
               ],
             ),
           )
-        : Container();
+        : const SizedBox.shrink();
   }
 
   Widget _profileDetail(
-      BuildContext context, CompanyDetailViewModel model, double _width) {
-    print("REBUILD!! + ${model.companyProfile.packageDescription.toString()}");
-    return Container(
+      BuildContext context, CompanyDetailViewModel model,DetailCompanyProfileModel companyProfile, double _width) {
+    print("REBUILD!! + ${companyProfile.packageDescription.toString()}");
+    return SizedBox(
       width: _width * 0.9,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           _sectionHeading("Profile Details"),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           _rowItem(context, "Profile Name",
-              model.formatIt(model.companyProfile.name), true),
+              model.formatIt(companyProfile.name), true),
           _rowItem(context, "Profile Category",
-              model.formatIt(model.companyProfile.category), false),
+              model.formatIt(companyProfile.category), false),
           _rowItem(context, "CGPA Requirement",
-              model.formatIt(model.companyProfile.cgpaRequirement), true),
+              model.formatIt(companyProfile.cgpaRequirement), true),
           _rowItem(context, "Description",
-              model.formatIt(model.companyProfile.description), false),
+              model.formatIt(companyProfile.description), false),
           _rowItem(
-              context, "Post", model.formatIt(model.companyProfile.post), true),
+              context, "Post", model.formatIt(companyProfile.post), true),
           _rowItem(context, "Posting Location",
-              model.formatIt(model.companyProfile.location), false),
+              model.formatIt(companyProfile.location), false),
           _rowItem(context, "Package Description",
-              model.formatIt(model.companyProfile.packageDescription), true),
+              model.formatIt(companyProfile.packageDescription), true),
           _rowItem(context, "Cover Letter Required",
-              (model.companyProfile.requiresCoverLetter) ? "Yes" : "No", false),
+              (companyProfile.requiresCoverLetter!) ? "Yes" : "No", false),
           _rowItem(context, "Target Credit Pool",
-              model.formatIt(model.companyProfile.targetCreditPool), true),
+              model.formatIt(companyProfile.targetCreditPool), true),
           _rowItem(
               context,
               "PPT Presence Required",
-              (model.companyProfile.talkPresenceRequired) ? "Yes" : "No",
+              (companyProfile.talkPresenceRequired!) ? "Yes" : "No",
               false),
           _rowItem(context, "PPT Date",
-              model.formatDate(model.companyProfile.talkDate), true),
+              model.formatDate(companyProfile.talkDate), true),
           _rowItem(context, "PPT Absence Cost",
-              model.companyProfile.talkAbsenceCost.toString(), false),
+              companyProfile.talkAbsenceCost.toString(), false),
           _rowItem(context, "PPT Status",
-              model.formatIt(model.companyProfile.talkStatus), true),
+              model.formatIt(companyProfile.talkStatus), true),
           _rowItem(
               context,
               "Application Deadline",
-              model.formatDate(model.companyProfile.applicationDeadline),
+              model.formatDate(companyProfile.applicationDeadline),
               false),
           _rowItem(context, "Application Cost",
-              model.companyProfile.applicationCost.toString(), true),
+              companyProfile.applicationCost.toString(), true),
         ],
       ),
     );
@@ -264,11 +275,11 @@ class CompanyDetailView extends StatelessWidget {
               ],
             ),
           )
-        : Container();
+        : const SizedBox.shrink();
   }
 
   Widget _eligibleBranches(
-      BuildContext context, CompanyDetailViewModel model, double _width) {
+      BuildContext context, DetailCompanyProfileModel companyProfile, double _width) {
     return Container(
       width: _width * 0.9,
       decoration: BoxDecoration(
@@ -284,14 +295,14 @@ class CompanyDetailView extends StatelessWidget {
       ),
       child: ExpansionTile(
         title: Text("View Eligible Branches"),
-        children: model.companyProfile.branchRequirement
+        children: companyProfile.branchRequirement!
             .map((val) => Container(
                   width: _width * 0.9,
                   padding: EdgeInsets.fromLTRB(5, 5, 0, 5),
                   child: Text(
-                    val.name,
+                    val.name!,
                     overflow: TextOverflow.clip,
-                    style: TextStyle(color: Color(0xFF666666)),
+                    style: const TextStyle(color: Color(0xFF666666)),
                   ),
                 ))
             .toList(),
@@ -300,8 +311,8 @@ class CompanyDetailView extends StatelessWidget {
   }
 
   Widget _description(
-      BuildContext context, CompanyDetailViewModel model, double _width) {
-    return Container(
+      BuildContext context, DetailCompanyProfileModel companyProfile, double _width) {
+    return SizedBox(
       width: _width * 0.9,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -309,7 +320,7 @@ class CompanyDetailView extends StatelessWidget {
         children: <Widget>[
           _sectionHeading("Description"),
           Text(
-            model.companyProfile.company.description,
+            companyProfile.company!.description!,
             style: TextStyle(color: Color(0xFF666666)),
           )
         ],
@@ -318,29 +329,29 @@ class CompanyDetailView extends StatelessWidget {
   }
 
   Widget _header(
-      BuildContext context, CompanyDetailViewModel model, double _width) {
-    return Container(
+      BuildContext context, CompanyDetailViewModel model, DetailCompanyProfileModel companyProfile, double _width) {
+    return SizedBox(
       width: _width * 0.9,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            model.companyProfile.company.name +
+            companyProfile.company!.name! +
                 " (" +
-                model.companyProfile.name +
+                companyProfile.name! +
                 ")",
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23),
           ),
           Text(
-            model.companyProfile.company.sector,
+            companyProfile.company!.sector!,
             style: TextStyle(color: Color(0xFF666666)),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Text(
-            "Last Date of Application : ${model.formatDate(model.companyProfile.applicationDeadline)}",
+            "Last Date of Application : ${model.formatDate(companyProfile.applicationDeadline)}",
             style: TextStyle(fontWeight: FontWeight.bold),
           )
         ],
@@ -349,7 +360,7 @@ class CompanyDetailView extends StatelessWidget {
   }
 
   Widget _sectionHeading(String heading) {
-    return Container(
+    return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Text(
         heading,
@@ -359,10 +370,10 @@ class CompanyDetailView extends StatelessWidget {
   }
 
   Widget _applyButton(
-      BuildContext context, CompanyDetailViewModel model, double _width) {
+      BuildContext context, CompanyDetailViewModel model, DetailCompanyProfileModel companyProfile, double _width) {
     dynamic parentViewModel = args["parentViewModel"];
     dynamic profileModel = args["profileModel"];
-    switch (model.companyProfile.profileStatus) {
+    switch (companyProfile.profileStatus) {
       case 'branch_not_eligible':
         return InkWell(
           child: _buttonContainer(
@@ -391,7 +402,6 @@ class CompanyDetailView extends StatelessWidget {
                     ));
           },
         );
-        break;
       case 'expired':
         return InkWell(
           child: _buttonContainer(
@@ -420,7 +430,6 @@ class CompanyDetailView extends StatelessWidget {
                     ));
           },
         );
-        break;
       case 'open':
         return InkWell(
           child: _buttonContainer(
@@ -431,21 +440,17 @@ class CompanyDetailView extends StatelessWidget {
                 Icons.send,
                 color: Colors.white,
               )),
-          onTap: () {
-            showModalBottomSheet(
+          onTap: () async {
+            bool? _didApply = await showModalBottomSheet<bool>(
                 context: context,
-                builder: (context) {
-                  return BottomModalApplySheet(
-                    profile: profileModel,
-                  );
-                }).then((value) {
-              print("APPLIED!!");
-              parentViewModel.refresh();
-              model.refreshDetails();
-            });
+                builder: (context) => BottomModalApplySheet(profile: profileModel));
+              if (_didApply == true){
+                print("APPLIED!!");
+                parentViewModel.refresh();
+                model.refreshDetails();
+              }
           },
         );
-        break;
       case 'withdrawable':
         return InkWell(
           child: _buttonContainer(
@@ -474,7 +479,7 @@ class CompanyDetailView extends StatelessWidget {
                           child: Text("Sure"),
                           onPressed: () async {
                             await parentViewModel.deleteApplication(
-                                model.companyProfile.application.id);
+                                companyProfile.application.id);
                             model.refreshDetails();
                             Navigator.of(context).pop();
                           },
@@ -483,7 +488,6 @@ class CompanyDetailView extends StatelessWidget {
                     ));
           },
         );
-        break;
       case 'locked':
         return InkWell(
           child: _buttonContainer(
@@ -511,7 +515,6 @@ class CompanyDetailView extends StatelessWidget {
                     ));
           },
         );
-        break;
       default:
         return Icon(Icons.signal_cellular_connected_no_internet_4_bar);
     }

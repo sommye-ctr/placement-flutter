@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/animation.dart';
-import 'package:placement/resources/endpoints.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:placement/resources/strings.dart';
-import 'package:placement/services/auth/auth_service.dart';
-import 'package:placement/shared/loadingPage.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+import '../../resources/endpoints.dart';
+import '../../resources/strings.dart';
+import '../../services/auth/auth_service.dart';
+import '../../shared/loadingPage.dart';
+
 class SignIn extends StatefulWidget {
-  final Function toggleview;
-  SignIn({this.toggleview});
+  SignIn();
 
   @override
   _SignInState createState() => _SignInState();
@@ -21,18 +19,18 @@ class _SignInState extends State<SignIn> with TickerProviderStateMixin {
 
   final _formKey = GlobalKey<FormState>();
 
-  AnimationController _controller;
-  Animation<double> _growAnimation;
+  late AnimationController _controller;
+  late Animation<double> _growAnimation;
 
-  AnimationController _controllerForm;
-  Animation<double> _growAnimationForm;
+  late AnimationController _controllerForm;
+  late Animation<double> _growAnimationForm;
 
   var _obscurePasswordField = true;
 
   var _errorPasswordString;
   var _errorUsernameString;
 
-  AuthService _auth;
+  late AuthService _auth;
   bool _loading = false;
 
   bool _keyboardIsVisible() {
@@ -128,7 +126,7 @@ class _SignInState extends State<SignIn> with TickerProviderStateMixin {
       BuildContext context, double _width, double _height) {
     return Column(
       children: <Widget>[
-        Container(
+        SizedBox(
           width: _width * 0.75,
           child: TextFormField(
             decoration: InputDecoration(
@@ -138,10 +136,10 @@ class _SignInState extends State<SignIn> with TickerProviderStateMixin {
             controller: _usernameController,
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10.0,
         ),
-        Container(
+        SizedBox(
           width: _width * 0.75,
           child: TextFormField(
             decoration: InputDecoration(
@@ -163,7 +161,7 @@ class _SignInState extends State<SignIn> with TickerProviderStateMixin {
             obscureText: _obscurePasswordField,
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
         SizedBox(
@@ -171,7 +169,7 @@ class _SignInState extends State<SignIn> with TickerProviderStateMixin {
           height: 40.0,
           child: TextButton(
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(Colors.blue),
+              backgroundColor: WidgetStateProperty.all(Colors.blue),
             ),
             child: Text(
               "Log In",
@@ -187,6 +185,7 @@ class _SignInState extends State<SignIn> with TickerProviderStateMixin {
                   'password': _passwordController.text
                 };
                 var res = await _auth.signInWithEmailPassword(dataMap);
+                if (!mounted) return;
                 print("Signed IN!! with $res");
                 if (res == 0) {
                   Navigator.of(context).pushNamedAndRemoveUntil(
@@ -252,7 +251,7 @@ class _SignInState extends State<SignIn> with TickerProviderStateMixin {
   }
 
   Widget containsBranding(BuildContext context, double _width, double _height) {
-    return Container(
+    return Align(
       alignment: Alignment.center,
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -279,7 +278,7 @@ class _SignInState extends State<SignIn> with TickerProviderStateMixin {
   }
 
   Widget _lotsOfLove(BuildContext context, double _width, double _height) {
-    return Row(
+    return const Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -304,8 +303,9 @@ class _SignInState extends State<SignIn> with TickerProviderStateMixin {
   }
 
   bool _validatePassword() {
+    _errorPasswordString = null;
     var isPasswordEmpty =
-        _passwordController.text == null || _passwordController.text == '';
+        _passwordController.text == '';
     if (isPasswordEmpty) {
       setState(() {
         _errorPasswordString = 'Password can not be empty';
@@ -315,8 +315,9 @@ class _SignInState extends State<SignIn> with TickerProviderStateMixin {
   }
 
   bool _validateUsername() {
+    _errorUsernameString = null;
     var isUsernameEmpty =
-        _usernameController.text == null || _usernameController.text == '';
+        _usernameController.text == '';
     if (isUsernameEmpty) {
       setState(() {
         _errorUsernameString = 'Username can not be empty';

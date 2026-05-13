@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:placement/shared/loadingPage.dart';
-import 'package:placement/viewmodels/ProfilesAppliedViewModel.dart';
-import 'package:placement/views/baseView.dart';
+
+import '../models/profilesModel.dart';
+import '../shared/loadingPage.dart';
+import '../viewmodels/ProfilesAppliedViewModel.dart';
+import 'baseView.dart';
 
 class ProfilesAppliedView extends StatelessWidget {
-  const ProfilesAppliedView({Key key}) : super(key: key);
+  const ProfilesAppliedView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,51 +28,48 @@ class ProfilesAppliedView extends StatelessWidget {
   }
 
   Widget _profilesBody(BuildContext context, ProfilesAppliedViewModel model) {
-    if (model.isLoading)
+    if (model.isBusy)
       return Center(
         child: LoadingPage(),
       );
+    final profiles = model.profiles;
+    if (profiles == null){
+      return Center(child: Text("Something went Wrong"),);
+    }
     if (model.isEmpty)
-      return Center(
+      return const Center(
         child: Text("No Applications found"),
       );
-    return Container(
-      constraints: BoxConstraints.expand(),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            _profilesList(context, model),
-          ],
-        ),
-      ),
-    );
+    return _profilesList(context, model, profiles);
   }
 
-  Widget _profilesList(BuildContext context, ProfilesAppliedViewModel model) {
+  Widget _profilesList(BuildContext context, ProfilesAppliedViewModel model, List<ProfilesModel> profiles) {
     return ListView.builder(
-      shrinkWrap: true,
-      physics: ScrollPhysics(),
       padding: EdgeInsets.all(0),
-      itemCount: model.profiles.length,
+      itemCount: profiles.length,
       itemBuilder: (context, index) {
         return Card(
           margin: EdgeInsets.only(bottom: 1),
           child: ListTile(
             title: Text(
-              model.profiles[index].companyName,
+              profiles[index].companyName,
               style: TextStyle(fontWeight: FontWeight.bold, height: 1.5),
             ),
             subtitle: Text(
-              model.profiles[index].application.resume.title +
-                  " sent" +
-                  ", " +
-                  model.profileStatus(index),
+              _subTitleText(model, profiles, index),
               style: TextStyle(height: 1.85),
             ),
           ),
         );
       },
     );
+  }
+
+  String _subTitleText(ProfilesAppliedViewModel model, List<ProfilesModel> profiles, int index) {
+    String? resumeTitle = profiles[index].application.resume.title;
+    if (resumeTitle == null){
+      return "Resume sent";
+    }
+    return  (resumeTitle+" sent, "+ model.profileStatus(index));
   }
 }

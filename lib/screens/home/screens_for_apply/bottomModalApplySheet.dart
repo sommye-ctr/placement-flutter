@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:placement/locator.dart';
-import 'package:placement/models/resumeModel.dart';
-import 'package:placement/resources/endpoints.dart';
-import 'package:placement/services/api_models/fetchService.dart';
-import 'package:placement/services/api_models/postService.dart';
-import 'package:placement/services/generic/requestService.dart';
-import 'package:placement/shared/loadingPage.dart';
+
+import '../../../locator.dart';
+import "../../../models/resumeModel.dart";
+import '../../../resources/endpoints.dart';
+import '../../../services/api_models/fetchService.dart';
+import '../../../services/generic/requestService.dart';
+import '../../../shared/loadingPage.dart';
 
 class BottomModalApplySheet extends StatefulWidget {
-  BottomModalApplySheet({Key key, this.profile}) : super(key: key);
-  final profile;
+  BottomModalApplySheet({super.key, required this.profile});
+  final dynamic profile;
 
   @override
   _BottomModalApplySheetState createState() => _BottomModalApplySheetState();
 }
 
 class _BottomModalApplySheetState extends State<BottomModalApplySheet> {
-  var profile;
+  late dynamic profile;
   var _fetch;
-  RequestService _requestService;
-  List<ResumeModel> _resumeList;
-  Future<dynamic> _resumeFuture;
+  late RequestService _requestService;
+  late List<ResumeModel> _resumeList;
+  late Future<dynamic> _resumeFuture;
 
   @override
   void initState() {
@@ -36,20 +36,17 @@ class _BottomModalApplySheetState extends State<BottomModalApplySheet> {
   @override
   Widget build(BuildContext context) {
     var _width = MediaQuery.of(context).size.width;
-    return Container(
-      child: FutureBuilder(
-        future: _resumeFuture,
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.data == null) {
-            return Container(
-              width: _width * 0.9,
-              height: 200,
-              child: LoadingPage(),
-            );
-          }
-          return _listOfResume(context, _width, snapshot);
-        },
-      ),
+    return FutureBuilder(
+      future: _resumeFuture,
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.data == null) {
+          return SizedBox(
+            height: 200,
+            child: LoadingPage(),
+          );
+        }
+        return _listOfResume(context, _width, snapshot);
+      },
     );
   }
 
@@ -60,7 +57,7 @@ class _BottomModalApplySheetState extends State<BottomModalApplySheet> {
       itemCount: snapshot.data.length, //snapshot.data.length,
       itemBuilder: (BuildContext context, int index) {
         return Card(
-          child: Container(
+          child: Padding(
             padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
             child: Column(
               children: <Widget>[
@@ -85,7 +82,7 @@ class _BottomModalApplySheetState extends State<BottomModalApplySheet> {
                                 ),
                                 TextButton(
                                   style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(
+                                    backgroundColor: WidgetStateProperty.all(
                                       Colors.blue,
                                     ),
                                   ),
@@ -94,6 +91,7 @@ class _BottomModalApplySheetState extends State<BottomModalApplySheet> {
                                     Fluttertoast.showToast(
                                         msg: "Processing...",
                                         toastLength: Toast.LENGTH_LONG);
+                                    // ignore: unused_local_variable
                                     int _apply = await _requestService
                                         .makePostRequest(
                                             EndPoints.HOST +
@@ -105,9 +103,17 @@ class _BottomModalApplySheetState extends State<BottomModalApplySheet> {
                                               snapshot.data[index].id.toString()
                                           //"cover_letter": null
                                         });
-                                    // TODO : handle the response
                                     Navigator.of(context).pop();
-                                    Navigator.of(context).pop();
+                                    if (_apply == -1){
+                                      // return true to reload parent page
+                                      Navigator.of(context).pop(true);
+                                    } else {
+                                      Fluttertoast.showToast(
+                                        msg: "An error occurred. Please check your connection.",
+                                        textColor: Colors.red,
+                                        toastLength: Toast.LENGTH_LONG);
+                                      Navigator.of(context).pop(false);
+                                    }
                                   },
                                 ),
                               ],
@@ -115,7 +121,7 @@ class _BottomModalApplySheetState extends State<BottomModalApplySheet> {
                           );
                         },
                       )
-                    : Container(),
+                    : const SizedBox.shrink(),
               ],
             ),
           ),
@@ -126,7 +132,7 @@ class _BottomModalApplySheetState extends State<BottomModalApplySheet> {
 
   Widget _headerWidget(int index) {
     if (index == 0) {
-      return Container(
+      return const Padding(
         padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
         child: Text(
           "Choose the resume you wish to apply with: ",
@@ -134,7 +140,7 @@ class _BottomModalApplySheetState extends State<BottomModalApplySheet> {
         ),
       );
     }
-    return SizedBox();
+    return const SizedBox.shrink();
   }
 
   Future<dynamic> _giveAppliedResumeList() async {

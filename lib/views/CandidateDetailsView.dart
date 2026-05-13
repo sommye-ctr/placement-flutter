@@ -1,14 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:placement/resources/R.dart';
-import 'package:placement/resources/strings.dart';
-import 'package:placement/shared/hexColor.dart';
-import 'package:placement/shared/loadingPage.dart';
-import 'package:placement/viewmodels/CandidateDetailsViewModel.dart';
-import 'package:placement/views/baseView.dart';
+
+import '../resources/R.dart';
+import '../resources/strings.dart';
+import '../shared/loadingPage.dart';
+import '../viewmodels/CandidateDetailsViewModel.dart';
+import 'baseView.dart';
 
 class CandidateDetailsView extends StatelessWidget {
-  const CandidateDetailsView({Key key}) : super(key: key);
+  const CandidateDetailsView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,10 +27,10 @@ class CandidateDetailsView extends StatelessWidget {
       BuildContext context, CandidateDetailsViewModel model, double _width) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Profile"),
+        title: const Text("Profile"),
         centerTitle: true,
       ),
-      body: Container(
+      body: ConstrainedBox(
         constraints: BoxConstraints.expand(),
         child: (model.isBusy)
             ? Center(
@@ -49,13 +49,13 @@ class CandidateDetailsView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          SizedBox(
+          const SizedBox(
             height: 30,
           ),
-          Center(
+          const Center(
             child: Text("Something went Wrong"),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           _menu(context, model, _width),
@@ -69,23 +69,23 @@ class CandidateDetailsView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          SizedBox(
+          const SizedBox(
             height: 30,
           ),
           _headerAndIcon(context, model.candidate, _width),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           _studentInfo(context, model.candidate, _width),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           _myApplicationsButton(context, model.candidate, _width),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           _myResumesButton(context, model.candidate, _width),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           _menu(context, model, _width),
@@ -95,7 +95,7 @@ class CandidateDetailsView extends StatelessWidget {
   }
 
   Widget _menu(BuildContext context, dynamic model, double _width) {
-    return Container(
+    return SizedBox(
       width: _width * 0.9,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -108,8 +108,8 @@ class CandidateDetailsView extends StatelessWidget {
               "FAQs",
               style: TextStyle(color: R.textColPrimary),
             ),
-            onTap: () {
-              model.launchURL(Strings.FAQ_LINK);
+            onTap: () async {
+              await model.launchURL(Strings.FAQ_LINK);
             },
           ),
           _divider(),
@@ -165,7 +165,7 @@ class CandidateDetailsView extends StatelessWidget {
   }
 
   Widget _divider() {
-    return Divider(
+    return const Divider(
       color: Color(0xFFe6e6e6),
       thickness: 1,
       indent: 10,
@@ -197,14 +197,14 @@ class CandidateDetailsView extends StatelessWidget {
     return Container(
       width: _width * 0.9,
       decoration: BoxDecoration(
-          color: Color(0xFF73A1FD).withOpacity(0.1),
+          color: const Color.fromRGBO(115, 161, 253, 0.1),
           borderRadius: BorderRadius.circular(10)),
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: <Widget>[
           Expanded(
             flex: 3,
-            child: Container(
+            child: Padding(
               padding: EdgeInsets.only(left: 20),
               child: Text(
                 heading,
@@ -212,7 +212,7 @@ class CandidateDetailsView extends StatelessWidget {
               ),
             ),
           ),
-          Expanded(
+          const Expanded(
             flex: 1,
             child: Icon(
               Icons.arrow_forward_ios,
@@ -225,7 +225,7 @@ class CandidateDetailsView extends StatelessWidget {
   }
 
   Widget _studentInfo(BuildContext context, dynamic model, double _width) {
-    return Container(
+    return SizedBox(
       width: _width * 0.9,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -235,22 +235,22 @@ class CandidateDetailsView extends StatelessWidget {
             model.degreeName,
             style: TextStyle(color: Colors.black54),
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           Text(
             model.departmentName,
             style: TextStyle(color: Colors.black54),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           _statusRows("Status: ", model.season + ", " + model.internshipStatus),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           _statusRows("Pool A Credits: ", model.creditsPoolA.toString()),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           _statusRows("Pool B Credits: ", model.creditsPoolB.toString()),
@@ -277,62 +277,39 @@ class CandidateDetailsView extends StatelessWidget {
   }
 
   Widget _headerAndIcon(BuildContext context, dynamic model, double _width) {
-    return Container(
+    final String? displayPicture = model.displayPicture;
+    return SizedBox(
       width: _width * 0.9,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Container(
-            child: Stack(
-              children: <Widget>[
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                      color: Colors.grey[300], shape: BoxShape.circle),
-                  child: Icon(
-                    Icons.account_circle,
-                    size: 60,
-                    color: Theme.of(context).primaryColor,
-                  ),
+          Stack(
+            children: <Widget>[
+              Container(
+                width: 60,
+                height: 60,
+                decoration: const BoxDecoration(
+                    color: Color(0xFFE0E0E0), shape: BoxShape.circle),
+                child: Icon(
+                  Icons.account_circle,
+                  size: 60,
+                  color: Theme.of(context).primaryColor,
                 ),
-                CachedNetworkImage(
-                  imageUrl: model.displayPicture,
-                  placeholder: _imagePlaceHolder,
-                  imageBuilder: (context, imageProvider) {
-                    return CircleAvatar(
-                      backgroundImage: imageProvider,
-                      radius: 30,
-                    );
-                  },
-                ),
-              ],
-            ),
+              ),
+              if (displayPicture != null)
+              CachedNetworkImage(
+                imageUrl: displayPicture,
+                placeholder: _imagePlaceHolder,
+                imageBuilder: (context, imageProvider) {
+                  return CircleAvatar(
+                    backgroundImage: imageProvider,
+                    radius: 30,
+                  );
+                },
+              ),
+            ],
           ),
-          // Container(
-          //   width: 60,
-          //   height: 60,
-          //   decoration: BoxDecoration(
-          //     color: Colors.red,
-          //     shape: BoxShape.circle,
-          //     image: DecorationImage(
-          //       image:
-          //     )
-          //   ),
-          //   child: (model.displayPicture != null) ?
-          //   CachedNetworkImage(
-          //     imageUrl: model.displayPicture,
-          //     placeholder: _imagePlaceHolder,
-          //     imageBuilder: (context, imageProvider) {
-          //       return CircleAvatar(
-          //         backgroundImage: imageProvider,
-          //         radius: 30,
-          //       );
-          //     },
-          //   ) :
-          //   _imagePlaceHolder(context, ""),
-          // ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           Text(

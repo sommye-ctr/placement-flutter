@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:placement/resources/strings.dart';
-import 'package:placement/services/api_models/fetchService.dart';
-import 'package:placement/services/auth/auth_service.dart';
-import 'package:placement/shared/loadingPage.dart';
+import '../../resources/strings.dart';
+import '../../services/auth/auth_service.dart';
+import '../../shared/loadingPage.dart';
 
 class SplashPage extends StatefulWidget {
-  SplashPage({Key key}) : super(key: key);
+  SplashPage({super.key});
 
   @override
   _SplashPageState createState() => _SplashPageState();
 }
 
 class _SplashPageState extends State<SplashPage> {
-  AuthService _auth;
+  // late AuthService _auth;
 
   @override
   void initState() {
     super.initState();
-    _auth = AuthService();
+    // _auth = AuthService();
+    AuthService();
     Timer(Duration(seconds: 2), () {
       Navigator.of(context)
           .pushNamedAndRemoveUntil('/wrapper', (Route<dynamic> route) => false);
@@ -28,8 +28,8 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double width = MediaQuery.of(context).size.width;
-    final double height = MediaQuery.of(context).size.height;
+    // final double width = MediaQuery.of(context).size.width;
+    // final double height = MediaQuery.of(context).size.height;
 
     return Material(
         child: Stack(

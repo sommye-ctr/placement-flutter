@@ -1,37 +1,21 @@
 
 import 'package:jiffy/jiffy.dart';
-import 'package:placement/locator.dart';
-import 'package:placement/models/profilesModel.dart';
-import 'package:placement/resources/modelResources.dart';
-import 'package:placement/services/api_models/deleteService.dart';
-import 'package:placement/services/generic/applyService.dart';
-import 'package:placement/shared/GlobalCache.dart';
-import 'package:placement/viewmodels/BaseViewModel.dart';
+
+import '../locator.dart';
+import '../models/profilesModel.dart';
+import '../resources/modelResources.dart';
+import '../services/api_models/deleteService.dart';
+import '../services/generic/applyService.dart';
+import '../shared/GlobalCache.dart';
+import 'BaseViewModel.dart';
 
 class ProfilesForMeViewModel extends BaseViewModel {
 
   ApplyService _applyService = locator<ApplyService>();
   GlobalCache _cache = locator<GlobalCache>();
   DeleteService _deleteService = DeleteService();
-  List<ProfilesModel> _profiles = [];
-  bool _isDisposed = false;
-  bool _loading = false;
-  bool _isNull = false;
-  
-  List<ProfilesModel> get profiles => _profiles;
-  bool get isLoading => _loading;
-  bool get isNull => _isNull;
-
-  @override
-  void dispose() { 
-    _isDisposed = true;
-    print("DISPOSING FOR ME!!");
-    super.dispose();
-  }
-
-  void notif() {
-    if(!_isDisposed) notifyListeners();
-  }
+  List<ProfilesModel>? _profiles= [];
+  List<ProfilesModel>? get profiles => _profiles;
 
   void _destroyProfileCache() {
     _cache.profilesForMe = null;
@@ -40,17 +24,23 @@ class ProfilesForMeViewModel extends BaseViewModel {
 
   String formatDate(String it) {
     if(it == "") return "-";
-    return Jiffy(it).yMMMd + " - " + Jiffy(it).Hm;
+    return Jiffy.parse(it).toLocal().yMMMd + " - " + Jiffy.parse(it).toLocal().Hm;
   }
 
   String profileStatus(int index) {
-    if(_profiles[index].status == "locked") return _profiles[index].application.statusDisplayName;
-    else if(_profiles[index].status == "open" && _profiles[index].applicationDeadline !=null) {
-      String date = "Apply before " + formatDate(_profiles[index].applicationDeadline);
+    final profiles = _profiles;
+    if (profiles == null) {
+      return "-";
+    };
+    if(profiles[index].status == "locked") return profiles[index].application.statusDisplayName ?? '-';
+    else if(profiles[index].status == "open" && profiles[index].applicationDeadline !=null) {
+      String date = "Apply before " + formatDate(profiles[index].applicationDeadline!);
       return date;
+    } else if (profiles[index].status == "withdrawable") {
+      final title = profiles[index].application?.resume?.title ?? "";
+      return title.isNotEmpty ? "$title Sent" : "Application Sent";
     }
-    else if(_profiles[index].status == "withdrawable") return _profiles[index].application.resume.title + " Sent";
-    return ModelResources.analyseProfileStatus(_profiles[index].status);
+    return ModelResources.analyseProfileStatus(profiles[index].status);
   }
 
   Future<void> refreshAndWait() async {
@@ -70,11 +60,8 @@ class ProfilesForMeViewModel extends BaseViewModel {
   }
   
   Future<void> populateProfiles() async {
-    _loading = true;
-    notif();
+    setLoading();
     _profiles = await _applyService.fetchProfileForMe();
-    if(_profiles == null) _isNull = true;
-    _loading = false;
-    notif();
+    setIdle();
   }
 }

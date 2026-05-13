@@ -6,17 +6,17 @@ import 'package:placement/services/auth/auth_service.dart';
 import 'package:provider/provider.dart';
 
 class WrapperPage extends StatefulWidget {
-  WrapperPage({Key key}) : super(key: key);
+  WrapperPage({super.key});
 
   @override
   _WrapperPageState createState() => _WrapperPageState();
 }
 
 class _WrapperPageState extends State<WrapperPage> {
-  AuthService _auth;
-  DataProvider data;
+  late AuthService _auth;
+  late DataProvider data;
   final Duration _duration = Duration(milliseconds: 300);
-  bool _isCollapsed = false;
+  // bool _isCollapsed = false;
 
   @override
   void initState() {
@@ -27,9 +27,9 @@ class _WrapperPageState extends State<WrapperPage> {
 
   @override
   Widget build(BuildContext context) {
-    var _size = MediaQuery.of(context).size;
-    double _height = _size.height;
-    double _width = _size.width;
+    // var _size = MediaQuery.of(context).size;
+    // double _height = _size.height;
+    // double _width = _size.width;
     //return _auth.authStateListener() ? HomePage() : Authenticate();
     return ChangeNotifierProvider(
         create: (context) => DataProvider(),

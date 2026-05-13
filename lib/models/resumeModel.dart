@@ -1,22 +1,22 @@
 class ResumeModel {
-  int id;
-  String candidate;
+  int? id;
+  String? candidate;
   String title;
-  bool isDefault;
+  bool? isDefault;
   bool isVerified;
   dynamic interests;
   dynamic achievements;
-  String computerLanguages;
-  String softwarePackages;
-  String additionalCourses;
-  String minorCourses;
-  String languages;
-  String resumeUrl;
+  String? computerLanguages;
+  String? softwarePackages;
+  String? additionalCourses;
+  String? minorCourses;
+  String? languages;
+  String? resumeUrl;
 
   ResumeModel({
     this.id,
     this.candidate,
-    this.title,
+    required this.title,
     this.isDefault,
     this.interests,
     this.achievements,
@@ -25,7 +25,7 @@ class ResumeModel {
     this.additionalCourses,
     this.minorCourses,
     this.languages,
-    this.isVerified,
+    required this.isVerified,
     this.resumeUrl
   });
 
@@ -33,7 +33,7 @@ class ResumeModel {
     return ResumeModel(
       id: _data['id'],
       candidate: _data['candidate'],
-      title: _data['title'],
+      title: _data['title'] ?? "Untitled",
       isDefault: _data['isDefault'],
       interests: _data['interests'],
       achievements: _data['achievements'],
@@ -42,7 +42,7 @@ class ResumeModel {
       additionalCourses: _data['additionalCourses'],
       minorCourses: _data['minorCourses'],
       languages: _data['languages'],
-      isVerified: _data['isVerified']
+      isVerified: _data['isVerified'] ?? false
     );
   }
 }
