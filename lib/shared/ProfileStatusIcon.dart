@@ -73,17 +73,15 @@ class ProfileStatusIcon extends StatelessWidget {
             Icons.send,
             color: Colors.green,
           ),
-          onPressed: () {
-            showModalBottomSheet(
+          onPressed: () async {
+            bool? _didApply = await showModalBottomSheet<bool>(
                 context: context,
-                builder: (context) {
-                  return BottomModalApplySheet(
-                    profile: profile,
-                  );
-                }).then((value) {
-              debugLog("APPLIED!!");
-              model.refresh();
-            });
+                builder: (context) => BottomModalApplySheet(profile: profile));
+              if (_didApply == true){
+                debugLog("APPLIED!!");
+                model.refresh();
+                model.refreshDetails();
+              }
           },
         );
       case 'withdrawable':

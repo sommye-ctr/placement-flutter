@@ -28,6 +28,7 @@ class RequestService {
       if (res.statusCode == 200) {
         return json.decode(res.body);
       }
+      return -1;
     } catch (e) {
       debugLog("POST $endpoint failed: ${e.toString()}");
       return -2;
