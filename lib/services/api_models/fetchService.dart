@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:placement/resources/endpoints.dart';
 import 'package:placement/services/auth/auth_service.dart';
+import 'package:placement/shared/debugLog.dart';
 
 class FetchService {
   static final FetchService _fetchService = FetchService.internal();
@@ -32,7 +33,7 @@ class FetchService {
       }
       return -1;
     } catch (e) {
-      print(e.toString());
+      debugLog(e.toString());
       return null;
     }
   }
